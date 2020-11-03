@@ -12,6 +12,9 @@ public class ResponseResult {
     private Object data;
 
 
+
+
+
     public static ResponseResult getBean(){
         Lock lock = new ReentrantLock();
 

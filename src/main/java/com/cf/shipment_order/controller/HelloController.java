@@ -1,7 +1,9 @@
 package com.cf.shipment_order.controller;
 
+import com.cf.shipment_order.api.ResponseResult;
 import com.cf.shipment_order.entity.User;
 import com.cf.shipment_order.service.UserService;
+import com.cf.shipment_order.utils.CommonsResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ public class HelloController {
 
     @ApiOperation(value="查询待入仓的订单")
     @GetMapping("hello")
-    public User hello(){
-        return userService.getUser();
+    public ResponseResult hello(){
+        return CommonsResult.getSuccesResult(userService.getUser());
     }
 }
