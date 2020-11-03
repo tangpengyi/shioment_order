@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cf.shipment_order.dao.ShipmentOrderDao" >
+
+    <resultMap id="OrderHeadMap" type="com.cf.shipment_order.entity.OrderHead">
+        <id property="id" column="id"></id>
+        <result property="order_no" column="order_no" jdbcType="VARCHAR"></result>
+        <result property="status" column="status" jdbcType="VARCHAR"></result>
+        <result property="customer_no" column="customer_no" jdbcType="VARCHAR"></result>
+        <result property="customer_name" column="customer_name" jdbcType="VARCHAR"></result>
+        <result property="customer_contact" column="customer_contact" jdbcType="VARCHAR"></result>
+        <result property="address" column="address" jdbcType="VARCHAR"></result>
+        <result property="shipment_date" column="shipment_date" jdbcType="DATE"></result>
+        <result property="priority" column="priority" jdbcType="VARCHAR"></result>
+        <result property="currency" column="currency" jdbcType="VARCHAR"></result>
+        <result property="requirements" column="requirements" jdbcType="VARCHAR"></result>
+    </resultMap>
+
+    <resultMap id="OrderDetailsMap" type="com.cf.shipment_order.entity.OrderDetails">
+        <id property="id" column="id"></id>
+        <result property="order_no" column="order_no" jdbcType="VARCHAR"></result>
+        <result property="material_id" column="material_id" jdbcType="VARCHAR"></result>
+        <result property="material_no" column="material_no" jdbcType="VARCHAR"></result>
+        <result property="material_name" column="material_name" jdbcType="VARCHAR"></result>
+        <result property="color_id" column="color_id" jdbcType="VARCHAR"></result>
+        <result property="color_no" column="color_no" jdbcType="VARCHAR"></result>
+        <result property="color_name" column="color_name" jdbcType="VARCHAR"></result>
+        <result property="quantity" column="quantity" jdbcType="INTEGER"></result>
+        <result property="weight" column="weight" jdbcType="DECIMAL"></result>
+        <result property="unit" column="unit" jdbcType="VARCHAR"></result>
+        <result property="customer_style_no" column="customer_style_no" jdbcType="VARCHAR"></result>
+        <result property="remark" column="remark" jdbcType="VARCHAR"></result>
+    </resultMap>
+
+    <insert id="addOrderHead" parameterType="com.cf.shipment_order.entity.OrderHead">
+        insert into shipment_head(order_no,status,customer_no,customer_name,customer_contact,address,shipment_date,sales_id,sales_name,priority,currency,requirements)
+        values(#{order_no},#{status},#{customer_no},#{customer_name},#{customer_contact},#{address},#{shipment_date},#{sales_id},#{sales_name},#{priority},#{currency},#{requirements})
+    </insert>
+
+    <insert id="addOrderDetails" parameterType="java.util.List">
+        insert into shipment_details(order_no,material_id,material_no,material_name,color_id,color_no,color_name,quantity,weight,unit,customer_style_no,remark)
+        values
+        <foreach collection="list" item="list" index="index" separator=",">
+            (
+            #{list.order_no},#{list.material_id},#{list.material_no}
+            ,#{list.material_name},#{list.color_id},#{list.color_no}
+            ,#{list.color_name},#{list.quantity},#{list.weight},#{list.unit}
+            ,#{list.customer_style_no},#{list.remark}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getOrderHeadByOrderNo" parameterType="java.lang.String" resultMap="OrderHeadMap">
+        select id,order_no,status,customer_no,customer_name,customer_contact,address,shipment_date,sales_id,sales_name,priority,currency,requirements
+        from shipment_head
+        where order_no = #{order_no}
+    </select>
+
+
+    <select id="getOrderDetailsByOrderNo" parameterType="java.lang.String" resultMap="OrderDetailsMap">
+        select id,order_no,material_id,material_no,material_name,color_id,color_no,color_name,quantity,weight,unit,customer_style_no,remark
+        from shipment_details
+        where order_no = #{order_no}
+    </select>
+
+    <update id="modityOrderHead" parameterType="com.cf.shipment_order.entity.OrderHead">
+        update shipment_head set status = #{status},customer_no = #{customer_no},customer_name = #{customer_name},customer_contact = #{customer_contact}
+        ,address = #{address},shipment_date = #{shipment_date},sales_id = #{sales_id},sales_name = #{sales_name},priority = #{priority},currency = #{currency}
+        ,requirements = #{requirements}
+        where id = #{id}
+    </update>
+
+    <update id="modityOrderDetails" parameterType="java.util.List">
+        <foreach collection="list" item="list" index="index" open="" close="" separator =";">
+            update shipment_details
+            <set>
+                material_id = #{list.material_id},material_no = #{list.material_no},material_name = #{list.material_name}
+                ,color_id = #{list.color_id},color_no = #{list.color_no},color_name = #{list.color_name}
+                ,quantity = #{list.quantity},weight = #{list.weight},unit = #{list.unit}
+                ,customer_style_no = #{list.customer_style_no},remark = #{list.remark}
+            </set>
+            <where>
+                id = #{list.id}
+            </where>
+        </foreach>
+    </update>
+
+    <select id="getOrderHeadByCondition" parameterType="java.util.Map" resultMap="OrderHeadMap">
+        select id,order_no,shipment_date,sales_name,shipment_date
+        from shipment_head
+        where 1=1
+        <if test="order_no != null and order_no != '' ">
+            and order_no = #{order_no}
+        </if>
+        <if test="start_time != null and start_time != '' ">
+            and shipment_date >= #{start_time}
+        </if>
+        <if test="end_time != null and end_time != '' ">
+            and shipment_date &lt;= #{end_time}
+        </if>
+        <if test="customer_name != null and customer_name != '' ">
+            and customer_name = #{customer_name}
+        </if>
+--         offset (${page_index}-1)*${page_size}+1  fetch next ${page_size} rows only
+    </select>
+
+    <select id="getOrderHeadCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1)
+        from shipment_head
+        where 1=1
+        <if test="order_no != null and order_no != '' ">
+            and order_no = #{order_no}
+        </if>
+        <if test="start_time != null and start_time != '' ">
+            and shipment_date >= #{start_time}
+        </if>
+        <if test="end_time != null and end_time != '' ">
+            and shipment_date &lt;= #{end_time}
+        </if>
+        <if test="customer_name != null and customer_name != '' ">
+            and customer_name = #{customer_name}
+        </if>
+    </select>
+
+
+
+</mapper>

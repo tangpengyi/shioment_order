@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cf.shipment_order.dao.BasicInfoDao" >
+
+    <select id="getCustomerByName" parameterType="java.lang.String" resultType="com.cf.shipment_order.entity.Customer">
+        select customer_id,customer_no,customer_name
+        from customer
+        where customer_name like CONCAT(CONCAT('%',#{customerName}),'%')
+    </select>
+
+    <select id="getContactsByCustomerNo" parameterType="java.lang.String" resultType="com.cf.shipment_order.entity.Contacts">
+        select id,customer_no,general_manager,address
+        from customer_contacts
+        where customer_no = #{customerNo}
+    </select>
+
+    <select id="getSalesByName" parameterType="java.lang.String" resultType="com.cf.shipment_order.entity.Sales">
+        select sales_id,sales_name,Sales_group
+        from sales
+        where sales_name like concat(concat('%',#{name}),'%')
+    </select>
+
+    <select id="getPriority" resultType="java.lang.String">
+        select priority_type from priority
+    </select>
+
+
+    <resultMap id="currencyMap" type="com.cf.shipment_order.entity.Currency">
+        <result column="currency_code" property="code"/>
+        <result column="currency_name" property="name"/>
+        <result column="exchange_rate" property="exchange_rate"/>
+        <result column="symbol" property="symbol"/>
+    </resultMap>
+    <select id="getCurrency" resultMap="currencyMap">
+        select currency_code,currency_name,exchange_rate,symbol
+        from currency
+    </select>
+
+    <select id="getOrderStatus" resultType="java.lang.String">
+        select constant_value from constant where constant_type = '状态'
+    </select>
+
+    <select id="getQuantityUnit" resultType="java.lang.String">
+        select constant_value from constant where constant_type = '单位'
+    </select>
+
+    <select id="getMaterila" parameterType="java.lang.String" resultType="com.cf.shipment_order.entity.Material">
+        select material_id,material_no,material_name,material_type
+        from material
+        where material_no like concat(concat('%',#{materialNo}),'%')
+    </select>
+
+
+    <select id="getColorByMaterialNo" parameterType="java.lang.String" resultType="com.cf.shipment_order.entity.Color">
+        select color_id,color_no,color_name
+        from color
+        where material_no like concat(concat('%',#{materialNo}),'%')
+    </select>
+</mapper>
